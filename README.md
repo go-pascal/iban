@@ -5,21 +5,21 @@ The BBAN ckeck is not yet implemented.
 This is needed for teh countries where the IBAN ckecksum is a constant.
 Currently the validation will return false.
 Concerned countries:
-Macedonia, Bosnia and Herzegovina, 
+Macedonia, Bosnia and Herzegovina, East Timor, Mauritania, Montenegro, Portugal, Slovenia, Tunisia
 
-Here a small sample to test it
-
-
+Here a small sample to test it.
 
 
-
-
+```
 package main
+
 import (
 	"fmt"
 	"github.com/go-pascal/iban"
 )
+
 func main() {
+
 	var OK, err = iban.IsCorrectIban("GB82 WEST 1234 5698 7654 32 ")
 	if err != nil {
 		fmt.Println(err.Error())
@@ -40,3 +40,4 @@ func main() {
 		fmt.Println("IBAN checksum :", ck)
 	}
 }
+```

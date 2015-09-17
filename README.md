@@ -2,7 +2,7 @@
 GoLang IBAN Validation module
 
 The BBAN ckeck is not yet implemented.
-This is needed for teh countries where the IBAN ckecksum is a constant.
+This is needed for the countries where the IBAN ckecksum is a constant.
 Currently the validation will return false.
 Concerned countries:
 Macedonia, Bosnia and Herzegovina, East Timor, Mauritania, Montenegro, Portugal, Slovenia, Tunisia

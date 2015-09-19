@@ -30,7 +30,7 @@ var (
 	passed_code     string
 	passed_chars    int
 	passed_checksum string
-	passeds_bban    string
+	passed_bban     string
 
 	country_list = map[string]iban_country{
 		"AL": iban_country{country: "Albania", chars: 28, bban_format: "8n, 16c", code: "AL", iban_fields: "ALkk bbbs sssx cccc cccc cccc cccc", comment: "b = National bank code s = Branch code x = National check digit c = Account number", standard_treatment: true},
@@ -105,10 +105,10 @@ var (
 )
 
 //****************** IsCorrectIban **********************************************//
-func IsCorrectIban(iban string, debug bool) (bool, error) {
+func IsCorrectIban(iban string, debug bool) (is_valid bool, err error, well_formated string) {
 	var iban_config iban_country
 	iban_valid := false
-
+	well_formated = ""
 	if len(iban) > 15 { // Minimum length for IBAN
 
 		// Clean up string
@@ -116,7 +116,7 @@ func IsCorrectIban(iban string, debug bool) (bool, error) {
 
 		// Split string up
 		passed_chars = len(iban)
-		passed_code, passed_checksum, passeds_bban = split_iban_up(iban)
+		passed_code, passed_checksum, passed_bban = split_iban_up(iban)
 
 		//fmt.Println(country_list)
 
@@ -130,29 +130,30 @@ func IsCorrectIban(iban string, debug bool) (bool, error) {
 				fmt.Println("--Passed Values--")
 				fmt.Println("Country code : " + passed_code)
 				fmt.Println("Length       : " + strconv.Itoa(passed_chars))
-				fmt.Println("BBAN         : " + passeds_bban)
+				fmt.Println("BBAN         : " + passed_bban)
 				fmt.Println("Checksum     : " + passed_checksum)
 				fmt.Println("--------------------------")
 			}
 			if iban_config.chars == passed_chars {
-				converted_iban := rearrange(passed_code, passed_checksum, passeds_bban)
+				converted_iban := rearrange(passed_code, passed_checksum, passed_bban)
 				converted_iban = convert_char_to_number(converted_iban)
 
 				if calculate_modulo(converted_iban) == 1 {
 					iban_valid = true
+					well_formated = split_to_4(iban)
 				}
 			} else {
-				return false, fmt.Errorf("IBAN: lenght (%s) does not match configuration length (%s)!", strconv.Itoa(passed_chars), strconv.Itoa(iban_config.chars))
+				return false, fmt.Errorf("IBAN: lenght (%s) does not match configuration length (%s)!", strconv.Itoa(passed_chars), strconv.Itoa(iban_config.chars)), well_formated
 			}
 
 		} else {
-			return false, fmt.Errorf("IBAN: country <%s> is not in the list!", passed_code)
+			return false, fmt.Errorf("IBAN: country <%s> is not in the list!", passed_code), well_formated
 		}
 
 	} else {
-		return false, fmt.Errorf("IBAN: incorect IBAN string passed <%s>", iban)
+		return false, fmt.Errorf("IBAN: incorect IBAN string passed <%s>", iban), well_formated
 	}
-	return iban_valid, nil
+	return iban_valid, nil, well_formated
 }
 
 func split_iban_up(iban string) (country_code string, checksum string, bban string) {
@@ -160,6 +161,20 @@ func split_iban_up(iban string) (country_code string, checksum string, bban stri
 	checksum = iban[2:4]
 	bban = iban[4:len(iban)]
 	return country_code, checksum, bban
+}
+
+func split_to_4(value string) (return_value string) {
+	n := 0
+	for n < len(value) {
+
+		if n < len(value)-3 {
+			return_value += value[n:n+4] + " "
+		} else {
+			return_value += value[n:len(value)]
+		}
+		n += 4
+	}
+	return return_value
 }
 
 //****************** GetIbanChecksum **********************************************
@@ -172,9 +187,9 @@ func GetIbanChecksum(iban string) (int, error) {
 
 		// Split string up
 		passed_chars = len(iban)
-		passed_code, passed_checksum, passeds_bban = split_iban_up(iban)
+		passed_code, passed_checksum, passed_bban = split_iban_up(iban)
 		passed_checksum = "00"
-		converted_iban := rearrange(passed_code, passed_checksum, passeds_bban)
+		converted_iban := rearrange(passed_code, passed_checksum, passed_bban)
 		converted_iban = convert_char_to_number(converted_iban)
 
 		iban_checksum = 98 - calculate_modulo(converted_iban)

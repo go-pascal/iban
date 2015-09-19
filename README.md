@@ -20,13 +20,13 @@ import (
 
 func main() {
 
-	var OK, err = iban.IsCorrectIban("GB82 WEST 1234 5698 7654 32 ", true) // passed: IBAN string , debug true/false
+	var OK, err, well_formated = iban.IsCorrectIban("GB82 WEST 1234 5698 7654 32 ", true) // passed: IBAN string , debug true/false
 	if err != nil {
 		fmt.Println(err.Error())
 	} else {
 
 		if OK {
-			fmt.Println("IBAN is valid")
+			fmt.Printf("IBAN %s is valid \n\r", well_formated)
 		} else {
 			fmt.Println("IBAN is not valid")
 		}

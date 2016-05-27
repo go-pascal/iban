@@ -12,7 +12,7 @@ The IBAN may be formated with spaces. Letter cases are ignored.
 Here a small sample to test it.
 
 
-```
+```go
 package main
 
 import (
@@ -42,4 +42,20 @@ func main() {
 		fmt.Println("IBAN checksum :", ck)
 	}
 }
+```
+
+```go
+package main
+
+import "github.com/RitchieFlick/iban"
+import "log"
+
+func main() {
+	iban, err := iban.NewIBAN("GB82WEST12345698765432")
+	if err != nil {
+		log.Print(err)
+	}
+	log.Print(iban.Number)
+}
+
 ```

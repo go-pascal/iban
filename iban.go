@@ -2,6 +2,7 @@
 package iban
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -13,6 +14,7 @@ type IBAN struct {
 	CountryCode string
 	Checksum    string
 	BBAN        string
+	BankCode    string
 }
 
 // NewIBAN creates a new instance of IBAN and checks before if the IBAN
@@ -20,15 +22,32 @@ type IBAN struct {
 func NewIBAN(ibanNumber string) (IBAN, error) {
 	var newIBAN IBAN
 
-	result, formatedIBANNumber, err := IsCorrectIban(ibanNumber, false)
-	if !result {
+	_, formatedIBANNumber, err := IsCorrectIban(ibanNumber, false)
+	if err != nil {
 		return IBAN{}, err
 	}
 
 	newIBAN.Number = formatedIBANNumber
-	newIBAN.CountryCode, newIBAN.Checksum, newIBAN.BBAN = splitIbanUp(ibanNumber)
+	newIBAN.CountryCode, newIBAN.Checksum, newIBAN.BBAN = splitIbanUp(formatedIBANNumber)
+
+	newIBAN.BankCode, err = getBankCode(newIBAN)
+	if err != nil {
+		newIBAN.BankCode = ""
+	}
 
 	return newIBAN, nil
+}
+
+func getBankCode(iban IBAN) (string, error) {
+	for _, code := range countryList {
+		if code.code == iban.CountryCode {
+			firstIndex := strings.Index(code.ibanFields, "b")
+			lastIndex := strings.LastIndex(code.ibanFields, "b")
+			return iban.Number[firstIndex : lastIndex+1], nil
+		}
+	}
+
+	return "", errors.New("No bank code found")
 }
 
 type ibanCountry struct {

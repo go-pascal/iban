@@ -81,7 +81,7 @@ func IsCorrectIban(iban string, debug bool) (isValid bool, wellFormated string, 
 
 		if ibanConfig.chars > 0 {
 			if ibanConfig.chars == passedChars {
-				convertedIban := rearrange(passedCode, passedChecksum, passedBban)
+				convertedIban := rearrangeIBAN(passedCode, passedChecksum, passedBban)
 				convertedIban = convertCharToNumber(convertedIban)
 
 				if calculateModulo(convertedIban) == 1 {
@@ -134,7 +134,7 @@ func GetIbanChecksum(iban string) (int, error) {
 		// Split string up
 		passedCode, passedChecksum, passedBban := splitIbanUp(iban)
 		passedChecksum = "00"
-		convertedIban := rearrange(passedCode, passedChecksum, passedBban)
+		convertedIban := rearrangeIBAN(passedCode, passedChecksum, passedBban)
 		convertedIban = convertCharToNumber(convertedIban)
 
 		ibanChecksum = 98 - calculateModulo(convertedIban)
@@ -160,7 +160,7 @@ func convertCharToNumber(value string) string {
 	return result
 }
 
-func rearrange(countryCode string, checksum string, bban string) string {
+func rearrangeIBAN(countryCode string, checksum string, bban string) string {
 	return bban + countryCode + checksum
 }
 

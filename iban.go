@@ -8,6 +8,9 @@ import (
 	"strings"
 )
 
+// ErrInvalidIBAN is returned when an invalid IBAN number was received
+var ErrInvalidIBAN = errors.New("Invalid IBAN number received")
+
 // IBAN represents an IBAN number, split up into its different parts.
 type IBAN struct {
 	Number      string
@@ -22,7 +25,11 @@ type IBAN struct {
 func NewIBAN(ibanNumber string) (IBAN, error) {
 	var newIBAN IBAN
 
-	_, formatedIBANNumber, err := IsCorrectIban(ibanNumber, false)
+	isIBANValid, formatedIBANNumber, err := IsCorrectIban(ibanNumber, false)
+	if !isIBANValid {
+		return IBAN{}, ErrInvalidIBAN
+	}
+
 	if err != nil {
 		return IBAN{}, err
 	}

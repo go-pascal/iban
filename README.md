@@ -22,7 +22,7 @@ import (
 
 func main() {
 
-	var OK, err, well_formated = iban.IsCorrectIban("GB82 WEST 1234 5698 7654 32 ", true) // passed: IBAN string , debug true/false
+	var OK, well_formated, err = iban.IsCorrectIban("GB82 WEST 1234 5698 7654 32 ", true) // passed: IBAN string , debug true/false
 	if err != nil {
 		fmt.Println(err.Error())
 	} else {

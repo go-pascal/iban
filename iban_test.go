@@ -1,9 +1,7 @@
-package iban_test
+package iban
 
 import (
 	"testing"
-
-	"github.com/ritchieflick/iban"
 )
 
 var validIBANTestNumbers = []struct {
@@ -20,8 +18,8 @@ var invalidIBANTestNumbers = []struct {
 
 func TestValidIBAN(t *testing.T) {
 	for _, ibanTestNumber := range validIBANTestNumbers {
-		result, err := iban.NewIBAN(ibanTestNumber.number)
-		if err != nil || result == (iban.IBAN{}) {
+		result, err := NewIBAN(ibanTestNumber.number)
+		if err != nil || result == (IBAN{}) {
 			t.Error("No object was created!")
 			t.Log(err)
 		}
@@ -30,7 +28,7 @@ func TestValidIBAN(t *testing.T) {
 
 func TestInvalidIBAN(t *testing.T) {
 	for _, ibanTestNumber := range invalidIBANTestNumbers {
-		_, err := iban.NewIBAN(ibanTestNumber.number)
+		_, err := NewIBAN(ibanTestNumber.number)
 		if err == nil {
 			t.Error("No error was thrown for an invalid IBAN number!")
 		}

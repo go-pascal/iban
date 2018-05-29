@@ -73,7 +73,7 @@ func IsCorrectIban(iban string, debug bool) (isValid bool, wellFormated string, 
 	var ibanConfig ibanCountry
 	ibanValid := false
 	wellFormated = ""
-	if len(iban) > 15 { // Minimum length for IBAN
+	if len(iban) >= 15 { // Minimum length for IBAN
 
 		// Clean up string
 		iban = strings.ToUpper(strings.Replace(iban, " ", "", -1))

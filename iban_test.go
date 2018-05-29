@@ -1,6 +1,8 @@
 package iban
 
 import (
+	"encoding/json"
+	"io/ioutil"
 	"testing"
 )
 
@@ -31,6 +33,38 @@ func TestInvalidIBAN(t *testing.T) {
 		_, err := NewIBAN(ibanTestNumber.number)
 		if err == nil {
 			t.Error("No error was thrown for an invalid IBAN number!")
+		}
+	}
+}
+
+type IBANMessage struct {
+	Country string `json:"country"`
+	Code    string `json:"code"`
+	IBAN    string `json:"iban"`
+}
+
+type IBANList struct {
+	IBANs []IBANMessage `json:"ibans"`
+}
+
+func TestIsCorrectIban(t *testing.T) {
+
+	data, err := ioutil.ReadFile("./data/iban.json")
+	if err != nil {
+		t.Error("error reading file", err)
+		t.FailNow()
+	}
+	var iList IBANList
+	err = json.Unmarshal(data, &iList)
+	if err != nil {
+		t.Error("error unmarshall data into the IBAN list", err)
+		t.FailNow()
+	}
+
+	for k, message := range iList.IBANs {
+		ok, _, _ := IsCorrectIban(message.IBAN, false)
+		if !ok {
+			t.Error("for test waiting for true got false", k, ":", message)
 		}
 	}
 }

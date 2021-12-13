@@ -57,7 +57,7 @@ func getBankCode(iban IBAN) (string, error) {
 	return "", errors.New("No bank code found")
 }
 
-type ibanCountry struct {
+type IbanCountry struct {
 	country           string
 	chars             int
 	bbanFormat        string
@@ -70,7 +70,7 @@ type ibanCountry struct {
 // IsCorrectIban checks if the given iban number corresponds to the rules of a valid iban number and also
 // returns a properly formated iban number string.
 func IsCorrectIban(iban string, debug bool) (isValid bool, wellFormated string, err error) {
-	var ibanConfig ibanCountry
+	var ibanConfig IbanCountry
 	ibanValid := false
 	wellFormated = ""
 	if len(iban) >= 15 { // Minimum length for IBAN

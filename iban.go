@@ -46,7 +46,7 @@ func NewIBAN(ibanNumber string) (IBAN, error) {
 }
 
 func getBankCode(iban IBAN) (string, error) {
-	for _, code := range countryList {
+	for _, code := range CountryList {
 		if code.code == iban.CountryCode {
 			firstIndex := strings.Index(code.ibanFields, "b")
 			lastIndex := strings.LastIndex(code.ibanFields, "b")
@@ -82,9 +82,7 @@ func IsCorrectIban(iban string, debug bool) (isValid bool, wellFormated string, 
 		passedChars := len(iban)
 		passedCode, passedChecksum, passedBban := splitIbanUp(iban)
 
-		//fmt.Println(country_list)
-
-		ibanConfig = countryList[passedCode]
+		ibanConfig = CountryList[passedCode]
 
 		if ibanConfig.chars > 0 {
 			if ibanConfig.chars == passedChars {

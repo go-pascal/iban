@@ -1,6 +1,6 @@
 package iban
 
-var countryList = map[string]ibanCountry{
+var CountryList = map[string]ibanCountry{
 	"AL": {country: "Albania", chars: 28, bbanFormat: "8n, 16c", code: "AL", ibanFields: "ALkk bbbs sssx cccc cccc cccc cccc", comment: "b = National bank code s = Branch code x = National check digit c = Account number", standardTreatment: true},
 	"AD": {country: "Andorra", chars: 24, bbanFormat: "8n,12c", code: "AD", ibanFields: "ADkk bbbb ssss cccc cccc cccc", comment: "b = National bank code s = Branch code c = Account number", standardTreatment: true},
 	"AT": {country: "Austria", chars: 20, bbanFormat: "16n", code: "AT", ibanFields: "ATkk bbbb bccc cccc cccc", comment: "b = National bank code c = Account number", standardTreatment: true},

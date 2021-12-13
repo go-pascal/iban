@@ -37,7 +37,8 @@ func NewIBAN(ibanNumber string) (IBAN, error) {
 		return IBAN{}, err
 	}
 
-	newIBAN.Number = formatedIBANNumber
+	newIBAN.Number = removeSpaces(ibanNumber)
+	newIBAN.NumberFormated = formatedIBANNumber
 	newIBAN.CountryCode, newIBAN.Checksum, newIBAN.BBAN = splitIbanUp(formatedIBANNumber)
 
 	newIBAN.BankCode, err = getBankCode(newIBAN)
@@ -64,7 +65,7 @@ func getBankCode(iban IBAN) (string, error) {
 			firstIndex := strings.Index(code.ibanFields, "b")
 			lastIndex := strings.LastIndex(code.ibanFields, "b")
 			if firstIndex >= 0 && lastIndex >= 0 {
-				return removeSpaces(iban.Number[firstIndex : lastIndex+1]), nil
+				return removeSpaces(iban.NumberFormated[firstIndex : lastIndex+1]), nil
 			}
 		}
 	}
@@ -78,7 +79,7 @@ func getSortCode(iban IBAN) (string, error) {
 			firstIndex := strings.Index(code.ibanFields, "s")
 			lastIndex := strings.LastIndex(code.ibanFields, "s")
 			if firstIndex >= 0 && lastIndex >= 0 {
-				return removeSpaces(iban.Number[firstIndex : lastIndex+1]), nil
+				return removeSpaces(iban.NumberFormated[firstIndex : lastIndex+1]), nil
 			}
 		}
 	}
@@ -92,7 +93,7 @@ func getAccountNumber(iban IBAN) (string, error) {
 			firstIndex := strings.Index(code.ibanFields, "c")
 			lastIndex := strings.LastIndex(code.ibanFields, "c")
 			if firstIndex >= 0 && lastIndex >= 0 {
-				return removeSpaces(iban.Number[firstIndex : lastIndex+1]), nil
+				return removeSpaces(iban.NumberFormated[firstIndex : lastIndex+1]), nil
 			}
 		}
 	}

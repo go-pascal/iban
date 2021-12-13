@@ -40,65 +40,44 @@ func NewIBAN(ibanNumber string) (IBAN, error) {
 	newIBAN.Number = removeSpaces(ibanNumber)
 	newIBAN.NumberFormated = formatedIBANNumber
 	newIBAN.CountryCode, newIBAN.Checksum, newIBAN.BBAN = splitIbanUp(formatedIBANNumber)
-
-	newIBAN.BankCode, err = getBankCode(newIBAN)
-	if err != nil {
-		newIBAN.BankCode = ""
-	}
-
-	newIBAN.SortCode, err = getSortCode(newIBAN)
-	if err != nil {
-		newIBAN.SortCode = ""
-	}
-
-	newIBAN.AccountNumber, err = getAccountNumber(newIBAN)
-	if err != nil {
-		newIBAN.AccountNumber = ""
-	}
+	newIBAN.BankCode, newIBAN.SortCode, newIBAN.AccountNumber = getBankInfo(newIBAN)
 
 	return newIBAN, nil
 }
 
-func getBankCode(iban IBAN) (string, error) {
+func getBankInfo(iban IBAN) (bankCode string, sortCode string, accountNumber string) {
+	bankCode = ""
+	sortCode = ""
+	accountNumber = ""
+
 	for _, code := range countryList {
 		if code.code == iban.CountryCode {
-			firstIndex := strings.Index(code.ibanFields, "b")
-			lastIndex := strings.LastIndex(code.ibanFields, "b")
-			if firstIndex >= 0 && lastIndex >= 0 {
-				return removeSpaces(iban.NumberFormated[firstIndex : lastIndex+1]), nil
+			// Bank code
+			bFirstIndex := strings.Index(code.ibanFields, "b")
+			bLastIndex := strings.LastIndex(code.ibanFields, "b")
+			if bFirstIndex >= 0 && bLastIndex >= 0 {
+				bankCode = removeSpaces(iban.NumberFormated[bFirstIndex : bLastIndex+1])
 			}
+
+			// Sort code
+			sFirstIndex := strings.Index(code.ibanFields, "s")
+			sLastIndex := strings.LastIndex(code.ibanFields, "s")
+			if sFirstIndex >= 0 && sLastIndex >= 0 {
+				sortCode = removeSpaces(iban.NumberFormated[sFirstIndex : sLastIndex+1])
+			}
+
+			// Account number
+			cFirstIndex := strings.Index(code.ibanFields, "c")
+			cLastIndex := strings.LastIndex(code.ibanFields, "c")
+			if cFirstIndex >= 0 && cLastIndex >= 0 {
+				accountNumber = removeSpaces(iban.NumberFormated[cFirstIndex : cLastIndex+1])
+			}
+
+			return bankCode, sortCode, accountNumber
 		}
 	}
 
-	return "", errors.New("No bank code found")
-}
-
-func getSortCode(iban IBAN) (string, error) {
-	for _, code := range countryList {
-		if code.code == iban.CountryCode {
-			firstIndex := strings.Index(code.ibanFields, "s")
-			lastIndex := strings.LastIndex(code.ibanFields, "s")
-			if firstIndex >= 0 && lastIndex >= 0 {
-				return removeSpaces(iban.NumberFormated[firstIndex : lastIndex+1]), nil
-			}
-		}
-	}
-
-	return "", errors.New("No sort code found")
-}
-
-func getAccountNumber(iban IBAN) (string, error) {
-	for _, code := range countryList {
-		if code.code == iban.CountryCode {
-			firstIndex := strings.Index(code.ibanFields, "c")
-			lastIndex := strings.LastIndex(code.ibanFields, "c")
-			if firstIndex >= 0 && lastIndex >= 0 {
-				return removeSpaces(iban.NumberFormated[firstIndex : lastIndex+1]), nil
-			}
-		}
-	}
-
-	return "", errors.New("No account number found")
+	return bankCode, sortCode, accountNumber
 }
 
 type ibanCountry struct {

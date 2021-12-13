@@ -63,7 +63,9 @@ func getBankCode(iban IBAN) (string, error) {
 		if code.code == iban.CountryCode {
 			firstIndex := strings.Index(code.ibanFields, "b")
 			lastIndex := strings.LastIndex(code.ibanFields, "b")
-			return iban.Number[firstIndex : lastIndex+1], nil
+			if firstIndex >= 0 && lastIndex >= 0 {
+				return removeSpaces(iban.Number[firstIndex : lastIndex+1]), nil
+			}
 		}
 	}
 
@@ -75,10 +77,9 @@ func getSortCode(iban IBAN) (string, error) {
 		if code.code == iban.CountryCode {
 			firstIndex := strings.Index(code.ibanFields, "s")
 			lastIndex := strings.LastIndex(code.ibanFields, "s")
-			if firstIndex < 0 || lastIndex < 0 {
-				return "", errors.New("No sort code found")
+			if firstIndex >= 0 && lastIndex >= 0 {
+				return removeSpaces(iban.Number[firstIndex : lastIndex+1]), nil
 			}
-			return iban.Number[firstIndex : lastIndex+1], nil
 		}
 	}
 
@@ -90,11 +91,13 @@ func getAccountNumber(iban IBAN) (string, error) {
 		if code.code == iban.CountryCode {
 			firstIndex := strings.Index(code.ibanFields, "c")
 			lastIndex := strings.LastIndex(code.ibanFields, "c")
-			return iban.Number[firstIndex : lastIndex+1], nil
+			if firstIndex >= 0 && lastIndex >= 0 {
+				return removeSpaces(iban.Number[firstIndex : lastIndex+1]), nil
+			}
 		}
 	}
 
-	return "", errors.New("No sort code found")
+	return "", errors.New("No account number found")
 }
 
 type ibanCountry struct {
@@ -239,4 +242,8 @@ func calculateModulo(iban string) int {
 		}
 	}
 	return rest
+}
+
+func removeSpaces(text string) string {
+	return strings.ReplaceAll(text, " ", "")
 }

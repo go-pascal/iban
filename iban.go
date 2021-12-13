@@ -13,11 +13,14 @@ var ErrInvalidIBAN = errors.New("Invalid IBAN number received")
 
 // IBAN represents an IBAN number, split up into its different parts.
 type IBAN struct {
-	Number      string
-	CountryCode string
-	Checksum    string
-	BBAN        string
-	BankCode    string
+	Number         string
+	NumberFormated string
+	CountryCode    string
+	Checksum       string
+	BBAN           string
+	BankCode       string
+	SortCode       string
+	AccountNumber  string
 }
 
 // NewIBAN creates a new instance of IBAN and checks before if the IBAN
@@ -42,11 +45,21 @@ func NewIBAN(ibanNumber string) (IBAN, error) {
 		newIBAN.BankCode = ""
 	}
 
+	newIBAN.SortCode, err = getSortCode(newIBAN)
+	if err != nil {
+		newIBAN.SortCode = ""
+	}
+
+	newIBAN.AccountNumber, err = getAccountNumber(newIBAN)
+	if err != nil {
+		newIBAN.AccountNumber = ""
+	}
+
 	return newIBAN, nil
 }
 
 func getBankCode(iban IBAN) (string, error) {
-	for _, code := range CountryList {
+	for _, code := range countryList {
 		if code.code == iban.CountryCode {
 			firstIndex := strings.Index(code.ibanFields, "b")
 			lastIndex := strings.LastIndex(code.ibanFields, "b")
@@ -57,7 +70,34 @@ func getBankCode(iban IBAN) (string, error) {
 	return "", errors.New("No bank code found")
 }
 
-type IbanCountry struct {
+func getSortCode(iban IBAN) (string, error) {
+	for _, code := range countryList {
+		if code.code == iban.CountryCode {
+			firstIndex := strings.Index(code.ibanFields, "s")
+			lastIndex := strings.LastIndex(code.ibanFields, "s")
+			if firstIndex < 0 || lastIndex < 0 {
+				return "", errors.New("No sort code found")
+			}
+			return iban.Number[firstIndex : lastIndex+1], nil
+		}
+	}
+
+	return "", errors.New("No sort code found")
+}
+
+func getAccountNumber(iban IBAN) (string, error) {
+	for _, code := range countryList {
+		if code.code == iban.CountryCode {
+			firstIndex := strings.Index(code.ibanFields, "c")
+			lastIndex := strings.LastIndex(code.ibanFields, "c")
+			return iban.Number[firstIndex : lastIndex+1], nil
+		}
+	}
+
+	return "", errors.New("No sort code found")
+}
+
+type ibanCountry struct {
 	country           string
 	chars             int
 	bbanFormat        string
@@ -70,7 +110,7 @@ type IbanCountry struct {
 // IsCorrectIban checks if the given iban number corresponds to the rules of a valid iban number and also
 // returns a properly formated iban number string.
 func IsCorrectIban(iban string, debug bool) (isValid bool, wellFormated string, err error) {
-	var ibanConfig IbanCountry
+	var ibanConfig ibanCountry
 	ibanValid := false
 	wellFormated = ""
 	if len(iban) >= 15 { // Minimum length for IBAN
@@ -82,7 +122,7 @@ func IsCorrectIban(iban string, debug bool) (isValid bool, wellFormated string, 
 		passedChars := len(iban)
 		passedCode, passedChecksum, passedBban := splitIbanUp(iban)
 
-		ibanConfig = CountryList[passedCode]
+		ibanConfig = countryList[passedCode]
 
 		if ibanConfig.chars > 0 {
 			if ibanConfig.chars == passedChars {
@@ -110,7 +150,7 @@ func IsCorrectIban(iban string, debug bool) (isValid bool, wellFormated string, 
 func splitIbanUp(iban string) (countryCode string, checksum string, bban string) {
 	countryCode = iban[0:2]
 	checksum = iban[2:4]
-	bban = iban[4:len(iban)]
+	bban = iban[4:]
 	return countryCode, checksum, bban
 }
 
@@ -121,7 +161,7 @@ func splitTo4(value string) (returnValue string) {
 		if n < len(value)-3 {
 			returnValue += value[n:n+4] + " "
 		} else {
-			returnValue += value[n:len(value)]
+			returnValue += value[n:]
 		}
 		n += 4
 	}
@@ -184,7 +224,7 @@ func calculateModulo(iban string) int {
 			}
 
 			rest = (value % 97)
-			iban = strconv.Itoa(rest) + iban[9:len(iban)]
+			iban = strconv.Itoa(rest) + iban[9:]
 		} else {
 			tempIBAN = iban
 

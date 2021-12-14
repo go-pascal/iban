@@ -23,6 +23,21 @@ type IBAN struct {
 	AccountNumber  string
 }
 
+// MarshalText implements encoding/text TextMarshaler interface.
+func (i IBAN) MarshalText() ([]byte, error) {
+	return []byte(i.Number), nil
+}
+
+// UnmarshalText implements encoding/text TextUnmarshaler interface.
+func (i *IBAN) UnmarshalText(text []byte) error {
+	iban, err := NewIBAN(string(text))
+	if err != nil {
+		return err
+	}
+	*i = iban
+	return nil
+}
+
 // NewIBAN creates a new instance of IBAN and checks before if the IBAN
 // number is actually valid or not.
 func NewIBAN(ibanNumber string) (IBAN, error) {

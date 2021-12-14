@@ -148,7 +148,7 @@ func splitTo4(value string) (returnValue string) {
 		}
 		n += 4
 	}
-	return returnValue
+	return strings.TrimSpace(returnValue)
 }
 
 // GetIbanChecksum returns the checksum of the given iban number.

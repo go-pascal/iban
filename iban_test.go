@@ -10,6 +10,8 @@ var validIBANTestNumbers = []struct {
 	number string
 }{
 	{"LU28 0019 4006 4475 0000"},
+	{"ES9121000418450200051332"},
+	{"ES9121000418450200051332       "},
 }
 
 var invalidIBANTestNumbers = []struct {

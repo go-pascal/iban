@@ -73,6 +73,7 @@
   {"country":"Ukraine","code":"UA","iban":"UA903052992990004149123456789"},
   {"country":"United Arab Emirates","code":"AE" ,"iban":"AE460090000000123456789"},
   {"country":"United Kingdom","code":"GB","iban":"GB98MIDL07009312345678"},
+  {"country":"Vatican", "code":"VA", "iban":"VA54001000000017267005"},
   {"country":"Virgin Islands British","code":"VG","iban":"VG21PACG0000000123456789"}
   ]
 }

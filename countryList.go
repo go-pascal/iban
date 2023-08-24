@@ -77,4 +77,5 @@ var countryList = map[string]ibanCountry{
 	"SC": ibanCountry{country: "Seychelles", chars: 31, bbanFormat: "4c,23n", code: "SC", ibanFields: "SCkk bbbb cccc cccc cccc cccc cccc mmm", comment: "b = National bank code c = Account number m = Currency", standardTreatment: true},
 	"UA": ibanCountry{country: "Ukraine", chars: 29, bbanFormat: "4c,21n", code: "UA", ibanFields: "UAkk bbbb cccc cccc cccc cccc cccc c", comment: "b = National bank code c = Account number", standardTreatment: true},
 	"IL": ibanCountry{country: "Israel", chars: 23, bbanFormat: "4c,15n", code: "IL", ibanFields: "ILkk bbbb cccc cccc cccc ccc", comment: "b = National bank code c = Account number", standardTreatment: true},
+	"VA": ibanCountry{country: "Vatican", chars: 22, bbanFormat: "3n,15n", code: "VA", ibanFields: "VAkk bbb cccc cccc cccc ccc", comment: "b = National bank code c = Account number", standardTreatment: true},
 }

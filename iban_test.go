@@ -2,14 +2,14 @@ package iban
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"os"
 	"testing"
 )
 
 var validIBANTestNumbers = []struct {
 	number string
 }{
-	{"LU28 0019 4006 4475 0000"},
+	{"EG210003700067100239218937900"},
 }
 
 var invalidIBANTestNumbers = []struct {
@@ -47,24 +47,35 @@ type IBANList struct {
 	IBANs []IBANMessage `json:"ibans"`
 }
 
+// TestIsCorrectIban reads a list of IBANs from JSON and verifies each one with detailed logging.
 func TestIsCorrectIban(t *testing.T) {
+	t.Log("Starting TestIsCorrectIban")
 
-	data, err := ioutil.ReadFile("./data/iban.json")
+	// Attempt to open the JSON file
+	t.Log("Attempting to open './data/iban.json'")
+	file, err := os.Open("./data/iban.json")
 	if err != nil {
-		t.Error("error reading file", err)
-		t.FailNow()
+		t.Fatalf("Error opening file: %v", err)
 	}
+	defer file.Close()
+	t.Log("Successfully opened './data/iban.json'")
+
+	// Decode JSON data
+	t.Log("Decoding JSON data from file")
 	var iList IBANList
-	err = json.Unmarshal(data, &iList)
-	if err != nil {
-		t.Error("error unmarshall data into the IBAN list", err)
-		t.FailNow()
+	if err := json.NewDecoder(file).Decode(&iList); err != nil {
+		t.Fatalf("Error unmarshalling data into the IBAN list: %v", err)
 	}
+	t.Log("Successfully decoded JSON data")
 
-	for k, message := range iList.IBANs {
+	// Test each IBAN entry
+	for i, message := range iList.IBANs {
+		//t.Logf("Testing IBAN: %s (Country: %s, Code: %s)", message.IBAN, message.Country, message.Code)
 		ok, _, _ := IsCorrectIban(message.IBAN, false)
 		if !ok {
-			t.Error("for test waiting for true got false", k, ":", message)
+			t.Errorf("Test case %d: Expected valid IBAN for %+v, but got invalid.", i+1, message)
 		}
 	}
+
+	t.Log("Finished TestIsCorrectIban")
 }
